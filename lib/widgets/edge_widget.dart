@@ -226,7 +226,8 @@ class _EdgeCardState extends State<EdgeCard> {
             },
           ),
           ActionChip(
-            label: Text("${widget.edge.predationRate * 100}%"),
+            label: Text(
+                "${(widget.edge.predationRate * 100).toStringAsPrecision(5)}%"),
             avatar: const Icon(Icons.sports_gymnastics_outlined),
             onPressed: () {
               showDialog(
@@ -252,7 +253,8 @@ class _EdgeCardState extends State<EdgeCard> {
             },
           ),
           ActionChip(
-            label: Text("${widget.edge.assimilationRate * 100}%"),
+            label: Text(
+                "${(widget.edge.assimilationRate * 100).toStringAsPrecision(5)}%"),
             avatar: const Icon(Icons.restaurant_menu_outlined),
             onPressed: () {
               showDialog(

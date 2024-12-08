@@ -102,7 +102,7 @@ class _FilePageState extends State<FilePage> {
       String cont1 = "${graph!.name}\n\n${graph!.order} "
           "${graph!.size}\n"
           "\n${graph!.params.where((e) => ecoParam.contains(e)).map((e) => "#$e").join("\n")}\n"
-          "\n${graph!.nodes.map((e) => "${e.name} (${e.alias}) {${(e.deathRate * 100).toStringAsFixed(2)} / ${(e.birthRate * 100).toStringAsFixed(2)} / ${e.capacity} / ${e.population} / ${e.biomassPerCapita}}").join(" | ")}\n"
+          "\n${graph!.nodes.map((e) => "${e.name} (${e.alias}) {${(e.deathRate).toStringAsFixed(2)} / ${(e.birthRate).toStringAsFixed(2)} / ${e.capacity} / ${e.population} / ${e.biomassPerCapita}}").join(" | ")}\n"
           "\n${graph!.edges.map((e) => "${e.source} -> ${e.target} {${e.predationRate} / ${e.assimilationRate}}").join(" \n ")}";
       file = File("${file!.path.split(".")[0]}.eco");
       if (file == null) return;
@@ -260,6 +260,135 @@ class _FilePageState extends State<FilePage> {
 
   @override
   Widget build(BuildContext context) {
+    AppBar appbar = AppBar(
+      title: file != null
+          ? Text(file!.path.split("\\").last.split(".").first)
+          : const Text("New Graph"),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () {
+              if (file != null) {
+                if (file!.path.split(".").last == "eco") {
+                  File("${file!.path.split(".")[0]}.sim").delete();
+                  file!.delete();
+                } else {
+                  File("${file!.path.split(".")[0]}.eco").delete();
+                  file!.delete();
+                }
+              }
+              Navigator.of(context).popUntil(
+                (route) => route.isFirst,
+              );
+            },
+            icon: const Icon(Icons.delete),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: save,
+            icon: const Icon(Icons.save),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: PopupMenuButton(
+            child: const Icon(Icons.download),
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  child: ListTile(
+                    title: const Text("Export as .dot"),
+                    subtitle: const Text(
+                      "Export the nodes and edges as a .dot / .gv file",
+                    ),
+                    onTap: () {
+                      if (!canSave()) {
+                        return;
+                      }
+                      Export().exportToDot(graph);
+                    },
+                  ),
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: const Text("Export as .graphml"),
+                    subtitle: const Text(
+                      "Export the nodes and edges as a .grapml file",
+                    ),
+                    onTap: () {
+                      if (!canSave()) {
+                        return;
+                      }
+                      Export().exportToGrahpml(graph);
+                    },
+                  ),
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: const Text("Export as .gexf"),
+                    subtitle: const Text(
+                      "Export the nodes and edges as a .gexf file (the gephi format)",
+                    ),
+                    onTap: () {
+                      if (!canSave()) {
+                        return;
+                      }
+                      Export().exportToGexf(graph);
+                    },
+                  ),
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: const Text("Export as .json"),
+                    subtitle: const Text(
+                      "Export the graph and the simulation as a .json file",
+                    ),
+                    onTap: () {
+                      if (!canSave()) {
+                        return;
+                      }
+                      Export().exportToJson(graph);
+                    },
+                  ),
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: const Text("Export as .csv"),
+                    subtitle: const Text(
+                      "Export the simulation as a .csv file",
+                    ),
+                    onTap: () {
+                      if (!canSave()) {
+                        return;
+                      }
+                      Export().exportToCsv(graph);
+                    },
+                  ),
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: const Text("Export as .xlsx"),
+                    subtitle: const Text(
+                      "Export the simulation as a .xlsx file (the excel format)",
+                    ),
+                    onTap: () {
+                      if (!canSave()) {
+                        return;
+                      }
+                      Export().exportToXlsx(graph);
+                    },
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+      ],
+    );
+
     return Shortcuts(
       shortcuts: <LogicalKeySet, Intent>{
         // Define the shortcut for Ctrl + S
@@ -277,134 +406,7 @@ class _FilePageState extends State<FilePage> {
         child: Focus(
           focusNode: _focusNode,
           child: Scaffold(
-            appBar: AppBar(
-              title: file != null
-                  ? Text(file!.path.split("\\").last.split(".").first)
-                  : const Text("New Graph"),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: IconButton(
-                    onPressed: () {
-                      if (file != null) {
-                        if (file!.path.split(".").last == "eco") {
-                          File("${file!.path.split(".")[0]}.sim").delete();
-                          file!.delete();
-                        } else {
-                          File("${file!.path.split(".")[0]}.eco").delete();
-                          file!.delete();
-                        }
-                      }
-                      Navigator.of(context).popUntil(
-                        (route) => route.isFirst,
-                      );
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: IconButton(
-                    onPressed: save,
-                    icon: const Icon(Icons.save),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: PopupMenuButton(
-                    child: const Icon(Icons.download),
-                    itemBuilder: (context) {
-                      return [
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: const Text("Export as .dot"),
-                            subtitle: const Text(
-                              "Export the nodes and edges as a .dot / .gv file",
-                            ),
-                            onTap: () {
-                              if (!canSave()) {
-                                return;
-                              }
-                              Export().exportToDot(graph);
-                            },
-                          ),
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: const Text("Export as .graphml"),
-                            subtitle: const Text(
-                              "Export the nodes and edges as a .grapml file",
-                            ),
-                            onTap: () {
-                              if (!canSave()) {
-                                return;
-                              }
-                              Export().exportToGrahpml(graph);
-                            },
-                          ),
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: const Text("Export as .gexf"),
-                            subtitle: const Text(
-                              "Export the nodes and edges as a .gexf file (the gephi format)",
-                            ),
-                            onTap: () {
-                              if (!canSave()) {
-                                return;
-                              }
-                              Export().exportToGexf(graph);
-                            },
-                          ),
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: const Text("Export as .json"),
-                            subtitle: const Text(
-                              "Export the graph and the simulation as a .json file",
-                            ),
-                            onTap: () {
-                              if (!canSave()) {
-                                return;
-                              }
-                              Export().exportToJson(graph);
-                            },
-                          ),
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: const Text("Export as .csv"),
-                            subtitle: const Text(
-                              "Export the simulation as a .csv file",
-                            ),
-                            onTap: () {
-                              if (!canSave()) {
-                                return;
-                              }
-                              Export().exportToCsv(graph);
-                            },
-                          ),
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: const Text("Export as .xlsx"),
-                            subtitle: const Text(
-                              "Export the simulation as a .xlsx file (the excel format)",
-                            ),
-                            onTap: () {
-                              if (!canSave()) {
-                                return;
-                              }
-                              Export().exportToXlsx(graph);
-                            },
-                          ),
-                        ),
-                      ];
-                    },
-                  ),
-                ),
-              ],
-            ),
+            appBar: appbar,
             body: graph == null
                 ? const Center(
                     child: CircularProgressIndicator(),
@@ -418,11 +420,15 @@ class _FilePageState extends State<FilePage> {
                         direction: Axis.vertical,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
                             child: GeneralWidget(
                               widgetSize: Size(
                                 MediaQuery.of(context).size.width * 7 / 16,
-                                MediaQuery.of(context).size.height * 5 / 16,
+                                (MediaQuery.of(context).size.height -
+                                            appbar.preferredSize.height) *
+                                        5 /
+                                        16 -
+                                    64,
                               ),
                               graph: graph!,
                               setGlobalState: globalSetState,
@@ -433,7 +439,11 @@ class _FilePageState extends State<FilePage> {
                             child: NodeWidget(
                               widgetSize: Size(
                                 MediaQuery.of(context).size.width * 7 / 16,
-                                MediaQuery.of(context).size.height * 7 / 16,
+                                (MediaQuery.of(context).size.height -
+                                            appbar.preferredSize.height) *
+                                        (16 - 5) /
+                                        16 -
+                                    48,
                               ),
                               graph: graph!,
                               setGlobalState: globalSetState,
@@ -444,7 +454,9 @@ class _FilePageState extends State<FilePage> {
                             child: EdgesWidget(
                               widgetSize: Size(
                                 MediaQuery.of(context).size.width * 7 / 16,
-                                MediaQuery.of(context).size.height * 14 / 16,
+                                (MediaQuery.of(context).size.height -
+                                        appbar.preferredSize.height) -
+                                    16,
                               ),
                               graph: graph!,
                               setGlobalState: globalSetState,
@@ -455,7 +467,9 @@ class _FilePageState extends State<FilePage> {
                             child: SimWidget(
                               widgetSize: Size(
                                 MediaQuery.of(context).size.width * 7 / 16,
-                                MediaQuery.of(context).size.height * 14 / 16,
+                                (MediaQuery.of(context).size.height -
+                                        appbar.preferredSize.height) -
+                                    16,
                               ),
                               sim: graph!.sim,
                             ),

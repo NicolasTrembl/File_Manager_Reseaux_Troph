@@ -159,133 +159,157 @@ class _NodeCardState extends State<NodeCard> {
           },
         ),
       ),
-      subtitle: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          ActionChip(
-            label: Text("${(widget.node.deathRate * 100)}%"),
-            avatar: const Icon(Icons.dangerous_outlined),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: EditValueScreen(
-                    value: widget.node.deathRate,
-                    onSet: (value) {
-                      widget.node.deathRate = value as double;
+      subtitle: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ActionChip(
+                label: Text(
+                    "${((widget.node.deathRate * 100).toStringAsPrecision(5))}%"),
+                avatar: const Icon(Icons.dangerous_outlined),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      child: EditValueScreen(
+                        value: widget.node.deathRate,
+                        onSet: (value) {
+                          widget.node.deathRate = value as double;
 
-                      setState(() {});
-                      widget.setGlobalState();
-                    },
-                    typeOfData: TypeOfData.rate,
-                    text: const [
-                      "Mortality Rate",
-                      "Enter the new mortality rate",
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          ActionChip(
-            label: Text("${widget.node.birthRate * 100}%"),
-            avatar: const Icon(Icons.child_friendly_outlined),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: EditValueScreen(
-                    value: widget.node.birthRate,
-                    onSet: (value) {
-                      widget.node.birthRate = value as double;
+                          setState(() {});
+                          widget.setGlobalState();
+                        },
+                        typeOfData: TypeOfData.rate,
+                        text: const [
+                          "Mortality Rate",
+                          "Enter the new mortality rate",
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ActionChip(
+                label: Text(
+                    "${(widget.node.birthRate * 100).toStringAsPrecision(5)}%"),
+                avatar: const Icon(Icons.child_friendly_outlined),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      child: EditValueScreen(
+                        value: widget.node.birthRate,
+                        onSet: (value) {
+                          widget.node.birthRate = value as double;
 
-                      setState(() {});
-                      widget.setGlobalState();
-                    },
-                    typeOfData: TypeOfData.rate,
-                    text: const [
-                      "Birth rate",
-                      "Enter the new birth rate",
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          ActionChip(
-            label: Text(widget.node.capacity.toString()),
-            avatar: const Icon(Icons.filter_tilt_shift_outlined),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: EditValueScreen(
-                    value: widget.node.capacity,
-                    onSet: (value) {
-                      widget.node.capacity = value;
+                          setState(() {});
+                          widget.setGlobalState();
+                        },
+                        typeOfData: TypeOfData.rate,
+                        text: const [
+                          "Birth rate",
+                          "Enter the new birth rate",
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ActionChip(
+                label: Text(widget.node.capacity.toStringAsExponential(3)),
+                avatar: const Icon(Icons.filter_tilt_shift_outlined),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      child: EditValueScreen(
+                        value: widget.node.capacity,
+                        onSet: (value) {
+                          widget.node.capacity = value;
 
-                      setState(() {});
-                      widget.setGlobalState();
-                    },
-                    typeOfData: TypeOfData.kg,
-                    text: const [
-                      "Capacity",
-                      "Enter the new capacity",
-                    ],
-                  ),
+                          setState(() {});
+                          widget.setGlobalState();
+                        },
+                        typeOfData: TypeOfData.kg,
+                        text: const [
+                          "Capacity",
+                          "Enter the new capacity",
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ActionChip(
+                label: Text(
+                  (widget.node.population < 1000)
+                      ? widget.node.population.toString()
+                      : widget.node.population.toStringAsExponential(3),
                 ),
-              );
-            },
-          ),
-          ActionChip(
-            label: Text(widget.node.population.toString()),
-            avatar: const Icon(Icons.people),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: EditValueScreen(
-                    value: widget.node.population,
-                    onSet: (value) {
-                      widget.node.population = value as int;
-                      setState(() {});
-                      widget.setGlobalState();
-                    },
-                    typeOfData: TypeOfData.number,
-                    text: const [
-                      "Population",
-                      "Enter the new population",
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          ActionChip(
-            label: Text(widget.node.biomassPerCapita.toString()),
-            avatar: const Icon(Icons.biotech_outlined),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: EditValueScreen(
-                    value: widget.node.biomassPerCapita,
-                    onSet: (value) {
-                      widget.node.biomassPerCapita = value as double;
-                      setState(() {});
-                      widget.setGlobalState();
-                    },
-                    typeOfData: TypeOfData.kg,
-                    text: const [
-                      "Biomass per capita",
-                      "Enter the new biomass per capita",
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
+                avatar: const Icon(Icons.people),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      child: EditValueScreen(
+                        value: widget.node.population,
+                        onSet: (value) {
+                          widget.node.population = value as int;
+                          setState(() {});
+                          widget.setGlobalState();
+                        },
+                        typeOfData: TypeOfData.number,
+                        text: const [
+                          "Population",
+                          "Enter the new population",
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ActionChip(
+                label:
+                    Text(widget.node.biomassPerCapita.toStringAsExponential(3)),
+                avatar: const Icon(Icons.biotech_outlined),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      child: EditValueScreen(
+                        value: widget.node.biomassPerCapita,
+                        onSet: (value) {
+                          widget.node.biomassPerCapita = value as double;
+                          setState(() {});
+                          widget.setGlobalState();
+                        },
+                        typeOfData: TypeOfData.kg,
+                        text: const [
+                          "Biomass per capita",
+                          "Enter the new biomass per capita",
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       trailing: SizedBox(
         width: 100,
